@@ -1,16 +1,12 @@
 package net.contrapt.faktup
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-
 abstract class AttributeContainer(val name: String = "", params: Map<String, Any?> = mapOf()) {
 
-    @JsonIgnore
-    val data = mutableMapOf<String, Any?>().withDefault {
-        AttributeListener.addMissing(it)
+    private val data = mutableMapOf<String, Any?>().withDefault {
         null
     }
-    @JsonIgnore
-    val attributes = mutableMapOf<String, Attribute>()
+
+    private val attributes = mutableMapOf<String, Attribute>()
 
     init {
         data.putAll(params)
@@ -27,4 +23,9 @@ abstract class AttributeContainer(val name: String = "", params: Map<String, Any
     override fun toString(): String {
         return attributes.toString()
     }
+
+    fun addAttribute(path: String, attribute: Attribute) = attributes.put(path, attribute)
+
+    operator fun get(key: String) = data[key]
+
 }
