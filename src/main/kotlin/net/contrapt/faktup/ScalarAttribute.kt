@@ -12,7 +12,7 @@ class ScalarAttribute<V> : Attribute() {
     operator fun getValue(owner: AttributeContainer, property: KProperty<*>) : V? {
         val value = owner[property.name] as V?
         if (value == null) {
-            AttributeListener.addMissing(path)
+            AttributeContainer.addMissing(path)
         }
         return value
     }

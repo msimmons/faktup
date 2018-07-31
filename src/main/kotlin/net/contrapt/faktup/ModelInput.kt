@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import kotlin.reflect.KProperty
 
-abstract class ModelInput<V, A>(val type: String, val estimated: Boolean, private val formula: () -> V?) {
+abstract class ModelInput<V, A>(val type: String, val estimated: Boolean, private val formula: () -> V?) : AttributeListener {
 
     var value: V? = null
         private set
@@ -16,7 +16,7 @@ abstract class ModelInput<V, A>(val type: String, val estimated: Boolean, privat
 
     var exception: Throwable? = null
 
-    val dependencies = mutableSetOf<ModelInput<*,*>>()
+    private val dependencies = mutableSetOf<ModelInput<*,*>>()
     val missing = mutableSetOf<String>()
 
     /**
@@ -53,8 +53,8 @@ abstract class ModelInput<V, A>(val type: String, val estimated: Boolean, privat
 
     private fun evaluate() {
         // Record dependency if there is a listener
-        AttributeListener.addDependency(this)
-        AttributeListener.pushInput(this)
+        AttributeContainer.addDependency(this)
+        AttributeContainer.pushListener(this)
         try {
             value = formula()
         }
@@ -62,7 +62,7 @@ abstract class ModelInput<V, A>(val type: String, val estimated: Boolean, privat
             exception = e
         }
         // Remove this listener
-        AttributeListener.popInput(this)
+        AttributeContainer.popListener(this)
     }
 
     override fun toString(): String {
@@ -79,6 +79,14 @@ abstract class ModelInput<V, A>(val type: String, val estimated: Boolean, privat
             is ModelInput<*,*> -> other.name == name
             else -> false
         }
+    }
+
+    override fun addDependency(input: ModelInput<*,*>) {
+        dependencies.add(input)
+    }
+
+    override fun addMissing(missing: String) {
+        this.missing.add(missing)
     }
 
     companion object {

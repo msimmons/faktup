@@ -1,5 +1,8 @@
 package net.contrapt.faktup
 
+import java.util.*
+import kotlin.concurrent.getOrSet
+
 abstract class AttributeContainer(val name: String = "", params: Map<String, Any?> = mapOf()) {
 
     private val data = mutableMapOf<String, Any?>().withDefault {
@@ -28,4 +31,37 @@ abstract class AttributeContainer(val name: String = "", params: Map<String, Any
 
     operator fun get(key: String) = data[key]
 
+    companion object {
+        private val listeners = ThreadLocal<Stack<AttributeListener>>()
+
+        fun pushListener(listener: AttributeListener) {
+            listeners.getOrSet { Stack() }.apply {
+                push(listener)
+            }
+        }
+
+        fun popListener(listener: AttributeListener) {
+            listeners.getOrSet { Stack() }.apply {
+                if (!isEmpty()) {
+                    pop()
+                }
+            }
+        }
+
+        fun addDependency(input: ModelInput<*,*>) {
+            listeners.getOrSet { Stack() }.apply {
+                if (!isEmpty()) {
+                    peek().addDependency(input)
+                }
+            }
+        }
+
+        fun addMissing(missing: String) {
+            listeners.getOrSet { Stack() }.apply {
+                if (!isEmpty()) {
+                    peek().addMissing(missing)
+                }
+            }
+        }
+    }
 }

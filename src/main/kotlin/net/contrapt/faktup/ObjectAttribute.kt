@@ -12,7 +12,7 @@ class ObjectAttribute<V: AttributeContainer>(private val factory: (String, Map<S
     operator fun getValue(owner: AttributeContainer, property: KProperty<*>) : V? {
         val value = owner[property.name]
         return when (value) {
-            null -> {AttributeListener.addMissing(path); null}
+            null -> {AttributeContainer.addMissing(path); null}
             is Map<*, *> -> factory(path, value as Map<String, Any?>)
             else -> throw IllegalArgumentException("Expecting a map for '${property.name}', got a '${value::class}'")
         }

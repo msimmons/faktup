@@ -18,6 +18,7 @@ class AttributeContainerSpec {
         container.obj?.id shouldBe "2"
         println(container)
         println(ObjectMapper().writeValueAsString(container))
+        println(container.missing)
     }
 
     @Test
@@ -29,6 +30,7 @@ class AttributeContainerSpec {
         shouldThrow<IllegalArgumentException> {
             container.obj?.id
         }
+        println(container.missing)
     }
 
     @Test
@@ -40,6 +42,7 @@ class AttributeContainerSpec {
         container.obj?.id shouldBe null
         println(container)
         println(ObjectMapper().writeValueAsString(container))
+        println(container.missing)
     }
 
     @Test
@@ -52,6 +55,7 @@ class AttributeContainerSpec {
         container.obj?.obj?.id shouldBe "3"
         println(container)
         println(ObjectMapper().writeValueAsString(container))
+        println(container.missing)
     }
 
     @Test
@@ -63,5 +67,6 @@ class AttributeContainerSpec {
         container.nums?.size shouldBe 5
         println(container)
         println(ObjectMapper().writeValueAsString(container))
+        println(container.missing)
     }
 }
