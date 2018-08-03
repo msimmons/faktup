@@ -1,6 +1,7 @@
 package net.contrapt.faktup
 
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
@@ -11,12 +12,11 @@ abstract class ModelInput<V, A>(val type: String, val estimated: Boolean, privat
     var value: V? = null
         private set
 
-    lateinit var name: String
-        private set
+    private lateinit var name: String
 
     var exception: Throwable? = null
 
-    private val dependencies = mutableSetOf<ModelInput<*,*>>()
+    val dependencies = mutableSetOf<String>()
     val missing = mutableSetOf<String>()
 
     /**
@@ -41,7 +41,7 @@ abstract class ModelInput<V, A>(val type: String, val estimated: Boolean, privat
     operator fun not() = (this() == null)
 
     open operator fun provideDelegate(owner: Any, property: KProperty<*>) : ModelInput<V, A> {
-        name = property.name
+        name = "${owner::class.simpleName}.${property.name}"
         inputs.put(name, this)
         return this
     }
@@ -53,7 +53,7 @@ abstract class ModelInput<V, A>(val type: String, val estimated: Boolean, privat
 
     private fun evaluate() {
         // Record dependency if there is a listener
-        AttributeContainer.addDependency(this)
+        AttributeContainer.addDependency(this.name)
         AttributeContainer.pushListener(this)
         try {
             value = formula()
@@ -81,7 +81,7 @@ abstract class ModelInput<V, A>(val type: String, val estimated: Boolean, privat
         }
     }
 
-    override fun addDependency(input: ModelInput<*,*>) {
+    override fun addDependency(input: String) {
         dependencies.add(input)
     }
 
@@ -154,38 +154,39 @@ operator fun <T: Number> T?.div(value: BigDecimal?) : BigDecimal? = when (value)
 
 operator fun BigDecimal?.plus(value: Number?) : BigDecimal? = when (value) {
     null -> null
-    else -> this?.add(N%value)
+    else -> this?.add(N[value])
 }
 
 operator fun BigDecimal?.minus(value: Number?) : BigDecimal? = when (value) {
     null -> null
-    else -> this?.subtract(N%value)
+    else -> this?.subtract(N[value])
 }
 
 operator fun BigDecimal?.times(value: Number?) : BigDecimal? = when (value) {
     null -> null
-    else -> this?.multiply(N%value)
+    else -> this?.multiply(N[value])
 }
 
 operator fun BigDecimal?.div(value: Number?) : BigDecimal? = when (value) {
     null -> null
-    else -> this?.divide(N%value)
+    else -> this?.divide(N[value])
 }
 
 object N {
-    operator fun rem(number: Number) : BigDecimal =  BigDecimal.valueOf(number.toDouble())
+    operator fun get(number: Number) : BigDecimal =  BigDecimal.valueOf(number.toDouble())
+    operator fun get(number: Number, scale: Int) : BigDecimal = BigDecimal.valueOf(number.toDouble()).setScale(scale, RoundingMode.HALF_UP)
 }
 
-object D {
-    operator fun rem(string: String) : LocalDate =  LocalDate.parse(string)
+object YMD {
+    operator fun get(string: String) : LocalDate =  LocalDate.parse(string)
 }
 
-object M {
-    operator fun rem(string: String) : YearMonth =  YearMonth.parse(string)
+object YM {
+    operator fun get(string: String) : YearMonth =  YearMonth.parse(string)
 }
 
 object I {
-    operator fun rem(string: String) : Instant =  Instant.parse(string)
+    operator fun get(string: String) : Instant =  Instant.parse(string)
 }
 
 infix fun Number.EQ(bd: BigDecimal?) : Boolean = BigDecimal.valueOf(this.toDouble()) == bd

@@ -2,6 +2,6 @@ package net.contrapt.faktup
 
 interface AttributeListener {
 
-    fun addDependency(input: ModelInput<*,*>)
+    fun addDependency(input: String)
     fun addMissing(missing: String)
 }

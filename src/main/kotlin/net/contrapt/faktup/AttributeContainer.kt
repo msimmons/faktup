@@ -48,7 +48,7 @@ abstract class AttributeContainer(val name: String = "", params: Map<String, Any
             }
         }
 
-        fun addDependency(input: ModelInput<*,*>) {
+        fun addDependency(input: String) {
             listeners.getOrSet { Stack() }.apply {
                 if (!isEmpty()) {
                     peek().addDependency(input)
