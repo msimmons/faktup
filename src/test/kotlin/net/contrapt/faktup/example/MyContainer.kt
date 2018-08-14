@@ -20,7 +20,8 @@ class MyContainer(params: Map<String, Any?>) : AttributeContainer(name = "input"
         AttributeContainer.pushListener(this)
     }
 
-    val id by scalarValue<String>()
-    val nums by scalarValue<List<Int>>()
-    val obj by objectValue(::MyObjectValue)
+    val id by simpleAttribute<String>()
+    val nums by simpleAttribute<List<Int>>()
+    val obj by objectAttribute(::MyObjectValue)
+    val objs by objectList(::MyObjectValue)
 }

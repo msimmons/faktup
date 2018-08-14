@@ -15,12 +15,16 @@ abstract class AttributeContainer(val name: String = "", params: Map<String, Any
         data.putAll(params)
     }
 
-    fun <V> scalarValue() : ScalarAttribute<V> {
-        return ScalarAttribute<V>()
+    fun <V> simpleAttribute() : SimpleAttribute<V> {
+        return SimpleAttribute<V>()
     }
 
-    fun <V: AttributeContainer> objectValue(factory: (String, Map<String, Any?>) -> V) : ObjectAttribute<V> {
+    fun <V: AttributeContainer> objectAttribute(factory: (String, Map<String, Any?>) -> V) : ObjectAttribute<V> {
         return ObjectAttribute<V>(factory)
+    }
+
+    fun <V: AttributeContainer> objectList(factory: (String, Map<String, Any?>) -> V) : CollectionAttribute<V> {
+        return CollectionAttribute<V>(factory)
     }
 
     override fun toString(): String {

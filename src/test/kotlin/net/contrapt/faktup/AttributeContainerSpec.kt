@@ -11,7 +11,8 @@ class AttributeContainerSpec {
 
     @Test
     fun success() {
-        val params = mapOf<String, Any?>("id" to "1", "obj" to mapOf<String, Any?>("id" to "2", "name" to "foo"))
+        val params = mapOf<String, Any?>("id" to "1", "obj" to mapOf<String, Any?>("id" to "2", "name" to "foo"),
+            "objs" to listOf(mapOf("id" to "2")))
 
         val container = MyContainer(params)
         container.id shouldBe "1"

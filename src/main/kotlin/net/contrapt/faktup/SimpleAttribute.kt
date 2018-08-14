@@ -2,9 +2,9 @@ package net.contrapt.faktup
 
 import kotlin.reflect.KProperty
 
-class ScalarAttribute<V> : Attribute() {
+class SimpleAttribute<V> : Attribute() {
 
-    operator fun provideDelegate(owner: AttributeContainer, kprop: KProperty<*>) : ScalarAttribute<V> {
+    operator fun provideDelegate(owner: AttributeContainer, kprop: KProperty<*>) : SimpleAttribute<V> {
         initialize(owner, kprop)
         return this
     }

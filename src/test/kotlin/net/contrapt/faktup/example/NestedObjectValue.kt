@@ -4,5 +4,5 @@ import net.contrapt.faktup.AttributeContainer
 
 class NestedObjectValue(name: String, params: Map<String, Any?>) : AttributeContainer(name, params) {
 
-    val id: String? by scalarValue()
+    val id: String? by simpleAttribute()
 }
